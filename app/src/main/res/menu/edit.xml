@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/delete"
+        android:title="Abbrechen"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_clear_white_48dp"/>
+
+    <item android:id="@+id/ok"
+        android:title="Speichern"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_check_white_48dp"/>
+
+</menu>

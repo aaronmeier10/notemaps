@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.bbc.app.bmeiea.notemaps.ShowActivity"
+    android:onClick="edit">
+
+
+
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:singleLine="true"
+        android:maxLength="20"
+        android:inputType="text"
+        android:id="@+id/titel"
+        android:hint="Titel..."
+        android:textSize="30dp"/>
+
+
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/text"
+        android:layout_below="@+id/titel"
+        android:hint="Notiz..."
+        android:textSize="20dp"/>
+
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        >
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_access_time_black_48dp"
+            android:id="@+id/zeit"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Keine Zeit definiert"
+            android:padding="10dp"
+            android:textSize="20dp"
+            android:layout_toRightOf="@+id/zeit"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/zeittext"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_place_black_48dp"
+            android:id="@+id/map"
+            android:layout_below="@+id/zeit"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Kein Ort definiert"
+            android:padding="10dp"
+            android:layout_below="@+id/zeit"
+            android:textSize="20dp"
+            android:layout_toRightOf="@+id/map"
+            android:id="@+id/maptext"
+            />
+
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

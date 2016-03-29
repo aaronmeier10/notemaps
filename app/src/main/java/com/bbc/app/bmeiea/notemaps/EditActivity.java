@@ -1,6 +1,5 @@
 package com.bbc.app.bmeiea.notemaps;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -9,8 +8,6 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -24,12 +21,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
-
-import junit.framework.Test;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,34 +32,80 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Map;
 
-public class CreateActivity extends AppCompatActivity {
+public class EditActivity extends AppCompatActivity {
+    int fileid;
+    long timeInMilis;
+    float x = 0;
+    float y = 0;
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
-    private long timeInMilis;
-    private float x = 0;
-    private float y = 0;
+
+    int cyear;
+    int cmonth;
+    int cday;
+    int chour;
+    int cminute;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        setContentView(R.layout.activity_edit);
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Intent intent = getIntent();
+        fileid = Integer.parseInt(intent.getStringExtra("id"));
+        String inhalt = read(fileid);
+        String[] inhalte = inhalt.split(";");
+
+        TextView titel = (TextView) findViewById(R.id.titel);
+        TextView text = (TextView) findViewById(R.id.text);
+        TextView zeit = (TextView) findViewById(R.id.zeittext);
+        TextView ort = (TextView) findViewById(R.id.maptext);
+
+        titel.setText(inhalte[0]);
+        text.setText(inhalte[1]);
+        if(inhalte[2] != "0"){
+            String time = inhalte[2];
+            long timestampLong = Long.parseLong(time);
+            Date d = new Date(timestampLong);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(d);
+            cyear = cal.get(Calendar.YEAR);
+            cmonth = cal.get(Calendar.MONTH)+1;
+            cday = cal.get(Calendar.DAY_OF_MONTH);
+            chour = cal.get(Calendar.HOUR_OF_DAY);
+            cminute = cal.get(Calendar.MINUTE);
+            c = cal;
+            timeInMilis = c.getTimeInMillis();
+            zeit.setText(getDate(timestampLong));
+        }
+        if(inhalte[3] != "0,0"){
+            ort.setText(inhalte[3]);
+        }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.create, menu);
+        getMenuInflater().inflate(R.menu.edit, menu);
         return true;
+    }
+
+    private String getDate(long timeStamp){
+
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd.MM.yyyy");
+            Date netDate = (new Date(timeStamp));
+            return sdf.format(netDate);
+        }
+        catch(Exception ex){
+            return "xx";
+        }
     }
 
     @Override
@@ -83,23 +120,17 @@ public class CreateActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Notiz verworfen", Toast.LENGTH_SHORT).show();
             finish();
         } else if (id == R.id.ok) {
-            String titeltext ="";
-            String texttext="";
-            String zeittext="";
-            String maptext="";
-
             EditText titel = (EditText) findViewById(R.id.titel);
-            titeltext = titel.getText().toString();
+            String titeltext = titel.getText().toString();
 
             EditText text = (EditText) findViewById(R.id.text);
-            texttext = text.getText().toString();
+            String texttext = text.getText().toString();
 
             TextView zeit = (TextView) findViewById(R.id.zeittext);
-            zeittext = zeit.getText().toString();
+            String zeittext = zeit.getText().toString();
 
             TextView map = (TextView) findViewById(R.id.maptext);
-            maptext = map.getText().toString();
-
+            String maptext = map.getText().toString();
 
             if(titeltext == "" || titeltext == "Titel..."){
                 Toast.makeText(getApplicationContext(), "Kein Titel", Toast.LENGTH_SHORT).show();
@@ -117,15 +148,15 @@ public class CreateActivity extends AppCompatActivity {
 
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
-                notificationIntent.putExtra("id",String.valueOf(countFiles()+1));
-                notificationIntent.putExtra("titel",titeltext);
                 notificationIntent.addCategory("android.intent.category.DEFAULT");
                 PendingIntent broadcast = PendingIntent.getBroadcast(this, 100, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMilis, broadcast);
 
-                Toast.makeText(getApplicationContext(), "Notiz wurde erstellt", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Notiz wurde gespeichert", Toast.LENGTH_SHORT).show();
             }
-            write(titeltext, texttext, String.valueOf(timeInMilis), String.valueOf(x+","+y));
+
+            deleteFile(fileid);
+            write(fileid,titeltext, texttext, String.valueOf(timeInMilis), String.valueOf(x+","+y));
 
             finish();
         }
@@ -161,15 +192,22 @@ public class CreateActivity extends AppCompatActivity {
 
     }
 
+    public void deleteFile(int filename){
+
+        File dir = getFilesDir();
+        File file = new File(dir, filename+".txt");
+        boolean deleted = file.delete();
+    }
 
 
 
-    public void write(String titel, String text, String zeit, String ort){
-
-        //rename();
 
 
-        String filename = String.valueOf(countFiles()+1)+".txt";
+    public void write(int filenum, String titel, String text, String zeit, String ort){
+
+
+
+        String filename = String.valueOf(filenum+".txt");
         String writetext = titel+";"+text+";"+zeit+";"+ort;
         FileOutputStream outputStream;
 
@@ -201,8 +239,6 @@ public class CreateActivity extends AppCompatActivity {
 
 
 
-
-
     Calendar c;
 
 
@@ -212,8 +248,8 @@ public class CreateActivity extends AppCompatActivity {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current time as the default values for the picker
             c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+            int hour = chour;
+            int minute = cminute;
 
             // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
@@ -234,19 +270,6 @@ public class CreateActivity extends AppCompatActivity {
         }
     }
 
-    private String getDate(long timeStamp){
-
-        try{
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd.MM.yyyy");
-            Date netDate = (new Date(timeStamp));
-            return sdf.format(netDate);
-        }
-        catch(Exception ex){
-            return "xx";
-        }
-    }
-
-
 
     public  class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
@@ -254,9 +277,9 @@ public class CreateActivity extends AppCompatActivity {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
+            int year = cyear;
+            int month = cmonth-1;
+            int day = cday;
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
@@ -278,7 +301,6 @@ public class CreateActivity extends AppCompatActivity {
 
             Calendar c2 = Calendar.getInstance();
             c2.setTimeInMillis(timeInMilis);
-
             t.setText(getDate(timeInMilis));
         }
     }
@@ -286,44 +308,32 @@ public class CreateActivity extends AppCompatActivity {
 
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    public String read(int file) {
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Create Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://com.bbc.app.bmeiea.notemaps/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
-    }
+        String ret = "";
 
-    @Override
-    public void onStop() {
-        super.onStop();
+        try {
+            InputStream inputStream = openFileInput(file+".txt");
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Create Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://com.bbc.app.bmeiea.notemaps/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+        return ret;
     }
 }
-

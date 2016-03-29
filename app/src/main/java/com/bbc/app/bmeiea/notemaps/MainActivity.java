@@ -1,6 +1,7 @@
 package com.bbc.app.bmeiea.notemaps;
 
 import android.app.AlarmManager;
+import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,9 +36,13 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-        ArrayList<String> notearray;
+        ArrayList<Note> notes = new ArrayList<Note>();
 
-
+    @Override
+    protected void onResume(){
+        super.onResume();
+        setAllNote();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,19 +71,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setAllNote();
-        //deleteFile();
-        listFiles();
-
-
-        ArrayAdapter adapter = new ArrayAdapter<String>(this, R.layout.activity_listview, notearray);
-
-        ListView listView = (ListView) findViewById(R.id.mobile_list);
-        listView.setAdapter(adapter);
-
-
-       ;
-
     }
 
     @Override
@@ -88,6 +82,8 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+
 
 
     @Override
@@ -162,28 +158,41 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setAllNote(){
-        //rename();
+        ArrayList<String> notearray = new ArrayList<String>();
+        rename();
         int counter = 1;
         int countfiles = countFiles();
-        Log.e("COUNTFILES",String.valueOf(countfiles));
+        notearray = new ArrayList<>();
         if(countfiles>0){
-            Log.e("COUNTFILES","1");
             while(countfiles>=counter){
-                Log.e("COUNTFILES","2");
-                Log.e("COUNTFILES",counter+".txt");
-                Log.e("COUNTFILES", "3");
                 String[] text = read(counter).split(";");
-                Log.v("COUNTFILES:", text[0]);
-                notearray.add(text[0]);
+                String[] ort = text[3].split(",");
+                notes.add(counter - 1, new Note(text[0], text[1], Long.parseLong(text[2]), Float.parseFloat(ort[0]), Float.parseFloat(ort[1])));
+
+                notearray.add(counter-1,text[0]);
                 counter++;
             }
         }else{
-            notearray.add("Keine Zeit definiert");
+            notearray.add(0, "Keine Notizen");
             return;
         }
 
+        ArrayAdapter adapter = new ArrayAdapter<String>(this, R.layout.activity_listview, notearray);
+
+        ListView listView = (ListView) findViewById(R.id.mobile_list);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent show = new Intent(getApplicationContext(), ShowActivity.class);
+                show.putExtra("id",String.valueOf(position+1));
+                startActivity(show);
+            }
+        });
+
 
     }
+
 
 
     public int countFiles(){
@@ -200,6 +209,23 @@ public class MainActivity extends AppCompatActivity
         return count;
     }
 
+
+    public void write(String inhalt, int file){
+
+        String filename = String.valueOf(file+".txt");
+        String writetext = inhalt;
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = openFileOutput(filename, MODE_PRIVATE);
+            outputStream.write(writetext.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void rename(){
 
         int count = countFiles();
@@ -212,14 +238,15 @@ public class MainActivity extends AppCompatActivity
         int filecounter = 1;
 
         while(count >= idcounter){
-            File file = new File(filecounter+".txt");
-
+            File file = new File(getFilesDir()+"/"+filecounter+".txt");
             if(file.exists()){
                 if(idcounter != filecounter){
-                    File file2 = new File(idcounter+".txt");
-                    boolean success = file.renameTo(file2);
+                    //File file2 = new File(idcounter+".txt");
+                    //boolean success = file.renameTo(file2);
+                    String inhalt = read(filecounter);
+                    deleteFile(filecounter);
+                    write(inhalt, idcounter);
                 }
-
                 filecounter++;
                 idcounter++;
             }else{
@@ -229,10 +256,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void deleteFile(){
+    public void deleteFile(int filename){
 
         File dir = getFilesDir();
-        File file = new File(dir, "2.txt");
+        File file = new File(dir, filename+".txt");
         boolean deleted = file.delete();
     }
 
@@ -254,3 +281,4 @@ public class MainActivity extends AppCompatActivity
 
 
 }
+
