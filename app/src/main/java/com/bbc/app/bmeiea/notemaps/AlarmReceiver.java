@@ -15,20 +15,26 @@ import com.bbc.app.bmeiea.notemaps.R;
 public class AlarmReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent notificationIntent = new Intent(context, MainActivity.class);
+        Intent notificationIntent = new Intent(context, ShowActivity.class);
+
+
+        int id = intent.getIntExtra("id",0);
+        String titel = intent.getStringExtra("titel");
+
+        notificationIntent.putExtra("id", id);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addParentStack(ShowActivity.class);
         stackBuilder.addNextIntent(notificationIntent);
 
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
-        Notification notification = builder.setContentTitle("Demo App Notification")
-                .setContentText("New Notification From Demo App..")
-                .setTicker("New Message Alert!")
-                .setSmallIcon(R.mipmap.ic_launcher)
+        Notification notification = builder.setContentTitle("Notemaps")
+                .setContentText(titel)
+                .setTicker("Benachrichtigung Notemaps")
+                .setSmallIcon(R.drawable.logo)
                 .setContentIntent(pendingIntent).build();
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

@@ -148,9 +148,12 @@ public class EditActivity extends AppCompatActivity {
 
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
+                notificationIntent.putExtra("id",fileid);
+                notificationIntent.putExtra("titel",titeltext);
                 notificationIntent.addCategory("android.intent.category.DEFAULT");
-                PendingIntent broadcast = PendingIntent.getBroadcast(this, 100, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent broadcast = PendingIntent.getBroadcast(this, fileid, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMilis, broadcast);
+
 
                 Toast.makeText(getApplicationContext(), "Notiz wurde gespeichert", Toast.LENGTH_SHORT).show();
             }
