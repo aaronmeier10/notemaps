@@ -41,22 +41,23 @@ public class ShowActivity extends AppCompatActivity {
         titel.setText(inhalte[0]);
         text.setText(inhalte[1]);
         if(inhalte[2] != "0"){
-            String time = inhalte[2];
-            long timestampLong = Long.parseLong(time);
-            Date d = new Date(timestampLong);
-            Calendar c = Calendar.getInstance();
-            c.setTime(d);
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH)+1;
-            int day = c.get(Calendar.DAY_OF_MONTH);
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-            zeit.setText(getDate(timestampLong));
+                String time = inhalte[2];
+                long timestampLong = Long.parseLong(time);
+                if(timestampLong != 0) {
+                    Date d = new Date(timestampLong);
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(d);
+                    int year = c.get(Calendar.YEAR);
+                    int month = c.get(Calendar.MONTH) + 1;
+                    int day = c.get(Calendar.DAY_OF_MONTH);
+                    int hour = c.get(Calendar.HOUR_OF_DAY);
+                    int minute = c.get(Calendar.MINUTE);
+                    zeit.setText(getDate(timestampLong));
+                }
         }
-        if(inhalte[3] != "0,0"){
+        if(inhalte[3].length() > 7){
             ort.setText(inhalte[3]);
         }
-
     }
 
 

@@ -17,14 +17,14 @@ public class AlarmReceiver extends BroadcastReceiver{
     public void onReceive(Context context, Intent intent) {
         Intent notificationIntent = new Intent(context, ShowActivity.class);
 
-
-        int id = intent.getIntExtra("id",0);
+        int id = intent.getIntExtra("id", 0);
         String titel = intent.getStringExtra("titel");
 
-        notificationIntent.putExtra("id", id);
+        notificationIntent.putExtra("id", String.valueOf(id));
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(ShowActivity.class);
+        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(notificationIntent);
 
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -34,10 +34,11 @@ public class AlarmReceiver extends BroadcastReceiver{
         Notification notification = builder.setContentTitle("Notemaps")
                 .setContentText(titel)
                 .setTicker("Benachrichtigung Notemaps")
-                .setSmallIcon(R.drawable.logo)
+                .setSmallIcon(R.drawable.notes_new)
                 .setContentIntent(pendingIntent).build();
+        notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notification);
+        notificationManager.notify(id, notification);
     }
 }
