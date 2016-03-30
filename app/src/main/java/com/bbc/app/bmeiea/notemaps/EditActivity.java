@@ -71,19 +71,21 @@ public class EditActivity extends AppCompatActivity {
         if(inhalte[2] != "0"){
             String time = inhalte[2];
             long timestampLong = Long.parseLong(time);
-            Date d = new Date(timestampLong);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(d);
-            cyear = cal.get(Calendar.YEAR);
-            cmonth = cal.get(Calendar.MONTH)+1;
-            cday = cal.get(Calendar.DAY_OF_MONTH);
-            chour = cal.get(Calendar.HOUR_OF_DAY);
-            cminute = cal.get(Calendar.MINUTE);
-            c = cal;
-            timeInMilis = c.getTimeInMillis();
-            zeit.setText(getDate(timestampLong));
+            if(timestampLong != 0) {
+                Date d = new Date(timestampLong);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(d);
+                cyear = cal.get(Calendar.YEAR);
+                cmonth = cal.get(Calendar.MONTH) + 1;
+                cday = cal.get(Calendar.DAY_OF_MONTH);
+                chour = cal.get(Calendar.HOUR_OF_DAY);
+                cminute = cal.get(Calendar.MINUTE);
+                c = cal;
+                timeInMilis = c.getTimeInMillis();
+                zeit.setText(getDate(timestampLong));
+            }
         }
-        if(inhalte[3] != "0,0"){
+        if(inhalte[3].length() > 7){
             ort.setText(inhalte[3]);
         }
 

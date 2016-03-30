@@ -111,6 +111,7 @@ public class CreateActivity extends AppCompatActivity {
                 return false;
             }
 
+
             if(timeInMilis != 0) {
 
 
@@ -118,13 +119,14 @@ public class CreateActivity extends AppCompatActivity {
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
                 notificationIntent.putExtra("id",countFiles()+1);
-                notificationIntent.putExtra("titel",titeltext);
+                notificationIntent.putExtra("titel", titeltext);
                 notificationIntent.addCategory("android.intent.category.DEFAULT");
                 PendingIntent broadcast = PendingIntent.getBroadcast(this, countFiles()+1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMilis, broadcast);
 
-                Toast.makeText(getApplicationContext(), "Notiz wurde erstellt", Toast.LENGTH_SHORT).show();
+
             }
+            Toast.makeText(getApplicationContext(), "Notiz wurde erstellt", Toast.LENGTH_SHORT).show();
             write(titeltext, texttext, String.valueOf(timeInMilis), String.valueOf(x+","+y));
 
             finish();

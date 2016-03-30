@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity
         int counter = 1;
         int countfiles = countFiles();
         notearray = new ArrayList<>();
+
         if(countfiles>0){
             while(countfiles>=counter){
                 String[] text = read(counter).split(";");
@@ -171,6 +172,37 @@ public class MainActivity extends AppCompatActivity
                 notes.add(counter - 1, new Note(text[0], text[1], Long.parseLong(text[2]), Float.parseFloat(ort[0]), Float.parseFloat(ort[1])));
 
                 notearray.add(counter-1,text[0]);
+
+
+
+                //Alarm deleten
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
+                notificationIntent.addCategory("android.intent.category.DEFAULT");
+                PendingIntent broadcast = PendingIntent.getBroadcast(this,counter, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                try {
+                    alarmManager.cancel(broadcast);
+                } catch (Exception e) {
+                    Log.e("ALARM...", "AlarmManager update was not canceled. " + e.toString());
+                }
+
+
+
+                //Alarm neu setzen
+                Long tsLong = System.currentTimeMillis();
+
+
+
+                if(Long.parseLong(text[2]) != 0 && Long.parseLong(text[2])>tsLong) {
+                    AlarmManager newalarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    Intent newnotificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
+                    newnotificationIntent.putExtra("id", counter);
+                    newnotificationIntent.putExtra("titel", text[0]);
+                    newnotificationIntent.addCategory("android.intent.category.DEFAULT");
+                    PendingIntent newbroadcast = PendingIntent.getBroadcast(this, counter, newnotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    newalarmManager.setExact(AlarmManager.RTC_WAKEUP, Long.parseLong(text[2]), newbroadcast);
+                }
+
                 counter++;
             }
         }else{
