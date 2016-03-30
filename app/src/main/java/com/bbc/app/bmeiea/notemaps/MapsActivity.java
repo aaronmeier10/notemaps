@@ -51,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
+        setAllNote();;
         for (int i = 0; notes.size()< i; i++) {
             mMap = googleMap;
 
