@@ -7,7 +7,7 @@
     https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=14:4C:47:80:01:8C:EC:33:BE:F4:AC:17:E2:93:DF:10:AE:D3:34:A7%3Bcom.bbc.app.bmeiea.notemaps
 
     You can also add your credentials to an existing key, using this line:
-    14:4C:47:80:01:8C:EC:33:BE:F4:AC:17:E2:93:DF:10:AE:D3:34:A7;com.bbc.app.bmeiea.notemaps
+    9F:71:BB:23:3C:7F:35:45:5D:F6:69:08:FD:A1:A3:23:6F:8C:A1:6C;com.bbc.app.bmeiea.notemaps
 
     Alternatively, follow the directions here:
     https://developers.google.com/maps/documentation/android/start#get-key
